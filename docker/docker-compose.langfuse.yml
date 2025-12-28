@@ -1,0 +1,72 @@
+# Agent Runtime - LangFuse Agent Observability
+# Usage: docker compose -f docker-compose.yml -f docker-compose.langfuse.yml up -d
+
+services:
+  # =============================================================================
+  # LangFuse Web (UI + API)
+  # =============================================================================
+  langfuse-web:
+    image: langfuse/langfuse:2
+    container_name: agent-runtime-langfuse-web
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/langfuse
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-changeme-generate-a-secret}
+      SALT: ${LANGFUSE_SALT:-changeme-generate-a-salt}
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+      CLICKHOUSE_URL: clickhouse://clickhouse:8123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # =============================================================================
+  # LangFuse Worker
+  # =============================================================================
+  langfuse-worker:
+    image: langfuse/langfuse:2
+    container_name: agent-runtime-langfuse-worker
+    command: ["node", "packages/worker/dist/index.js"]
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/langfuse
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+      CLICKHOUSE_URL: clickhouse://clickhouse:8123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # =============================================================================
+  # ClickHouse (LangFuse OLAP)
+  # =============================================================================
+  clickhouse:
+    image: clickhouse/clickhouse-server:24
+    container_name: agent-runtime-clickhouse
+    environment:
+      CLICKHOUSE_DB: langfuse
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ports:
+      - "8123:8123"   # HTTP
+      - "9009:9000"   # Native (mapped to 9009 to avoid MinIO conflict)
+    restart: unless-stopped
+
+volumes:
+  clickhouse_data:

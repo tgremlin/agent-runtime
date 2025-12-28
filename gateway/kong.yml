@@ -1,0 +1,88 @@
+# Kong Gateway - Declarative Configuration (DB-less mode)
+# https://docs.konghq.com/gateway/latest/admin-api/declarative-configuration/
+
+_format_version: "3.0"
+_transform: true
+
+services:
+  # ---------------------------------------------------------------------------
+  # API Service (Control Plane)
+  # ---------------------------------------------------------------------------
+  - name: agent-runtime-api
+    url: http://api:8000
+    routes:
+      - name: api-runs
+        paths:
+          - /runs
+        strip_path: false
+      - name: api-agents
+        paths:
+          - /agents
+        strip_path: false
+      - name: api-tenants
+        paths:
+          - /tenants
+        strip_path: false
+      - name: api-health
+        paths:
+          - /health
+          - /ready
+        strip_path: false
+
+plugins:
+  # ---------------------------------------------------------------------------
+  # Global Rate Limiting
+  # ---------------------------------------------------------------------------
+  - name: rate-limiting
+    config:
+      minute: 1000
+      policy: local
+      fault_tolerant: true
+      hide_client_headers: false
+
+  # ---------------------------------------------------------------------------
+  # Request/Response Logging
+  # ---------------------------------------------------------------------------
+  - name: file-log
+    config:
+      path: /dev/stdout
+      reopen: false
+
+  # ---------------------------------------------------------------------------
+  # CORS (for local development)
+  # ---------------------------------------------------------------------------
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - X-Request-Id
+      credentials: true
+      max_age: 3600
+
+# ---------------------------------------------------------------------------
+# OIDC Plugin (uncomment when Keycloak is configured)
+# ---------------------------------------------------------------------------
+# plugins:
+#   - name: openid-connect
+#     service: agent-runtime-api
+#     config:
+#       issuer: http://keycloak:8080/realms/agent-runtime
+#       client_id: agent-runtime
+#       client_secret: ${OIDC_CLIENT_SECRET}
+#       redirect_uri: http://localhost:8000/callback
+#       scopes:
+#         - openid
+#         - profile
+#         - email
