@@ -225,7 +225,47 @@ This stack is aligned to the **MVP Run Model** and PRD direction: **durable agen
 
 ---
 
-# MVP “Core vs Optional” summary
+## 14) Python Tooling & Package Management
+
+### ✅ Recommended: uv
+- **Why (Justification):**
+  - Extremely fast Python package installer and resolver (10-100x faster than pip)
+  - Drop-in replacement for pip, pip-tools, and virtualenv
+  - Handles virtual environment creation automatically
+  - Supports pyproject.toml natively with `uv sync`
+  - Written in Rust for performance and reliability
+- **Docs:** https://docs.astral.sh/uv/
+- **Alternative:** pip + pip-tools + virtualenv
+  - **Why:** Traditional Python toolchain; widely known but slower
+  - Docs: https://pip.pypa.io/
+
+### ✅ Recommended: Hatchling (build backend)
+- **Why (Justification):**
+  - Modern, standards-compliant Python build backend
+  - Excellent pyproject.toml support
+  - Used for editable installs across packages
+- **Docs:** https://hatch.pypa.io/latest/
+
+### Usage Pattern
+```bash
+# Install dependencies and create virtual environment
+uv sync
+
+# Run commands in the virtual environment
+uv run python -m mymodule
+uv run uvicorn app:main --reload
+uv run pytest
+
+# Add a new dependency
+uv add package-name
+
+# Install editable package
+uv pip install -e ../packages/core
+```
+
+---
+
+# MVP "Core vs Optional" summary
 
 ## Core (MVP-required)
 - Kong (edge)
@@ -235,6 +275,7 @@ This stack is aligned to the **MVP Run Model** and PRD direction: **durable agen
 - Redis (cache/ephemeral)
 - MinIO (artifacts)
 - API + Worker services
+- **uv** (Python package management)
 
 ## Optional in MVP (recommended soon after)
 - OpenTelemetry Collector

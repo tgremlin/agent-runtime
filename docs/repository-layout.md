@@ -72,6 +72,24 @@ This repository **owns**:
 - Control + execution planes
 - Infrastructure definitions (local + cloud)
 
+### Python Package Management
+
+This project uses **uv** for Python package management:
+- Fast dependency resolution and installation
+- Automatic virtual environment creation
+- Lock files for reproducible builds
+
+```bash
+# Install dependencies in any package/service
+uv sync
+
+# Run commands
+uv run pytest
+uv run uvicorn app:main
+```
+
+See [VERSIONS.md](../VERSIONS.md) for pinned dependency versions.
+
 This repository **does not own**:
 - Customer-facing UI (future repo)
 - Marketplace/catalog UX (future repo)

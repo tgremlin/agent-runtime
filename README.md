@@ -75,6 +75,8 @@ agent-runtime/
 
 ### Application
 - **Language**: Python 3.11+
+- **Package Manager**: [uv](https://docs.astral.sh/uv/) (fast pip alternative)
+- **Build Backend**: Hatchling
 - **API Framework**: FastAPI
 - **Validation**: Pydantic
 - **Agent Frameworks**: PydanticAI, CrewAI (agent-agnostic)
@@ -84,7 +86,20 @@ agent-runtime/
 ### Prerequisites
 - Docker & Docker Compose
 - Python 3.11+
-- uv (recommended) or pip
+- [uv](https://docs.astral.sh/uv/) - Fast Python package manager
+
+### Installing uv
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Or via pip (any platform)
+pip install uv
+```
 
 ### Local Development
 
@@ -135,6 +150,7 @@ Key variables:
 
 - [Product Requirements (PRD)](docs/PRD.md)
 - [Technology Stack](docs/technology-stack.md)
+- [Technology Versions](VERSIONS.md) - Pinned versions & documentation links
 - [MVP Sequence Diagram](docs/mvp-sequence-diagram.md)
 - [Repository Layout](docs/repository-layout.md)
 
@@ -152,12 +168,34 @@ from agent_runtime_core.db import get_session
 ### Running Tests
 
 ```bash
-# All tests
-pytest
+# Specific service (using uv)
+cd services/api && uv run pytest
+cd services/worker && uv run pytest
 
-# Specific service
-cd services/api && pytest
-cd services/worker && pytest
+# Or activate the venv first
+cd services/api
+source .venv/bin/activate  # Linux/macOS
+# .venv\Scripts\activate   # Windows
+pytest
+```
+
+### Common uv Commands
+
+```bash
+# Sync dependencies (creates .venv if needed)
+uv sync
+
+# Run a command in the virtual environment
+uv run <command>
+
+# Add a new dependency
+uv add <package>
+
+# Add a dev dependency
+uv add --dev <package>
+
+# Update lock file
+uv lock
 ```
 
 ## Deployment

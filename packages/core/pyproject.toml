@@ -5,15 +5,15 @@ description = "Shared models, database, and utilities for Agent Runtime"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=2.0",
-    "sqlalchemy>=2.0",
-    "asyncpg>=0.29",
+    "pydantic==2.10.3",
+    "sqlalchemy==2.0.36",
+    "asyncpg==0.30.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.23",
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
 ]
 
 [build-system]

@@ -6,7 +6,7 @@ services:
   # LangFuse Web (UI + API)
   # =============================================================================
   langfuse-web:
-    image: langfuse/langfuse:2
+    image: langfuse/langfuse:2.95.0
     container_name: agent-runtime-langfuse-web
     environment:
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/langfuse
@@ -33,7 +33,7 @@ services:
   # LangFuse Worker
   # =============================================================================
   langfuse-worker:
-    image: langfuse/langfuse:2
+    image: langfuse/langfuse:2.95.0
     container_name: agent-runtime-langfuse-worker
     command: ["node", "packages/worker/dist/index.js"]
     environment:
@@ -55,7 +55,7 @@ services:
   # ClickHouse (LangFuse OLAP)
   # =============================================================================
   clickhouse:
-    image: clickhouse/clickhouse-server:24
+    image: clickhouse/clickhouse-server:24.8
     container_name: agent-runtime-clickhouse
     environment:
       CLICKHOUSE_DB: langfuse
